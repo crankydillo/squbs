@@ -135,8 +135,8 @@ object PerpetualStreamMatValueSpecHelper {
   def useSystem[PC <: PerpStream[_] : ClassTag](fn: Try[ActorRef] => Unit)
                                                (implicit system: ActorSystem, mat: Materializer): Unit = {
 
-    val perpRef = system.actorOf(Props(classTag[PC].runtimeClass))
-    val someRef = system.actorOf(Props(classOf[SomeActor], perpRef, mat))
+    val perpRef = system.actorOf(Props[PC])
+    val someRef = system.actorOf(Props(new SomeActor(perpRef)))
 
     Try(Await.result(someRef ? payload, timeoutDuration)) match {
       case Success(l) => fn(Success(perpRef))
